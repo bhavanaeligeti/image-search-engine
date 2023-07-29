@@ -1,0 +1,63 @@
+const accessKey = "bV96a4lNcKA4NcGTp5HB4ZIPa_ntGI17BmzUoOBx6v4";
+
+const formSection = document.querySelector("form");
+const searchInput = document.querySelector("#search-input");
+const searchResults = document.querySelector(".search-results");
+const showMore = document.querySelector("#show-more-button");
+
+let inputData = "";
+let page = 1; 
+
+const searchImages = async () =>{
+    inputData = searchInput.value;
+
+    // create a dynamic url 
+    const url = `https://api.unsplash.com/search/photos?
+    page=${page}&query=${inputData}&client_id=${accessKey}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+    const results = data.results;
+
+    if(page === 1){
+        searchResults.innerHTML = "";
+    }
+
+    results.map(result => {
+
+        // create the container
+        const imageWrapper = document.createElement('div');
+        imageWrapper.classList.add("search-result");
+        const image = document.createElement('img');
+        image.src = result.urls.small;
+        image.alt = result.alt_description;
+        const imageLink = document.createElement('a');
+        imageLink.href = result.links.html;
+        imageLink.target = "_blank";
+        imageLink.textContent = result.alt_description;
+
+        // append to our webpage
+        imageWrapper.appendChild(image);
+        imageWrapper.appendChild(imageLink);
+        searchResults.appendChild(imageWrapper);
+    });
+
+    // we have to increase the page no.
+    page++;
+    if(page > 1){
+        showMore.style.display = "block";
+    }
+}
+
+
+// add events 
+
+formSection.addEventListener("submit", event => {
+    event.preventDefault();
+    page = 1;
+    searchImages();
+})
+
+showMore.addEventListener("click", () => {
+    searchImages();
+})
